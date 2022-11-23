@@ -1,3 +1,5 @@
+import { memo, useEffect } from "react";
+
 import {
   Button,
   FormControl,
@@ -5,24 +7,46 @@ import {
   FormLabel,
   Input,
 } from "@chakra-ui/react";
+import { useForm } from "react-hook-form";
 
-type Props = {};
+const FORM_FIELD_REPOSITORY_ID = "repositoryURI";
+
+type Props = {
+  onSubmit: (uri: string) => Promise<void>;
+  error: string | null;
+  onSuccess?: () => void;
+};
 
 type FormValues = {
   repositoryURI: string;
 };
 
-import { useForm } from "react-hook-form";
-
-export const RepositoryForm = (props: Props) => {
+export const RepositoryForm = memo(({ onSubmit, error, onSuccess }: Props) => {
   const {
     register,
     handleSubmit,
+    setError,
+    clearErrors,
     formState: { errors },
   } = useForm<FormValues>();
 
-  const onSubmit = ({ repositoryURI }: FormValues) => {
-    alert(JSON.stringify(repositoryURI));
+  useEffect(() => {
+    if (error) {
+      setError("repositoryURI", {
+        message: error,
+      });
+    }
+
+    if (!error) {
+      clearErrors();
+    }
+  }, [error]);
+
+  const onSubmitHandler = async ({ repositoryURI }: FormValues) => {
+    try {
+      await onSubmit(repositoryURI);
+      onSuccess?.();
+    } catch (error) {}
   };
 
   return (
@@ -30,13 +54,13 @@ export const RepositoryForm = (props: Props) => {
       <div>Logo</div>
       <div>
         <h1>Title</h1>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmitHandler)}>
           <FormControl>
             <FormLabel>
               <Input
                 type="text"
                 placeholder="https://"
-                {...register("repositoryURI", { required: true })}
+                {...register(FORM_FIELD_REPOSITORY_ID, { required: true })}
               />
             </FormLabel>
             <FormErrorMessage>
@@ -48,4 +72,4 @@ export const RepositoryForm = (props: Props) => {
       </div>
     </div>
   );
-};
+});
