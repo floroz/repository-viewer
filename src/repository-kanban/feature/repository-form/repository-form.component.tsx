@@ -34,15 +34,13 @@ export const RepositoryForm = memo(({ onSubmit, error }: Props) => {
 
   useEffect(() => {
     if (error) {
-      setError("repositoryURI", {
+      return setError("repositoryURI", {
         message: error,
       });
-      return;
     }
 
     if (!error) {
-      clearErrors();
-      return;
+      return clearErrors();
     }
   }, [error]);
 
@@ -51,13 +49,13 @@ export const RepositoryForm = memo(({ onSubmit, error }: Props) => {
   );
 
   return (
-    <Flex padding="32" gap="2rem">
-      <Box flexBasis="30%">
+    <Flex p="32" gap="2rem" maxW="120rem" justify="center">
+      <Box flexBasis="30%" flexShrink="1">
         <Heading size="lg">CodeSandbox</Heading>
       </Box>
       <Box flexGrow="1">
         <Heading size="4xl" mb="4rem">
-          Start by Pasting the RepositoryURL
+          Start by pasting the repository URL.
         </Heading>
         <form onSubmit={onSubmitHandler} noValidate>
           <Flex>
@@ -74,7 +72,7 @@ export const RepositoryForm = memo(({ onSubmit, error }: Props) => {
               </FormErrorMessage>
             </FormControl>
             <Button type="submit" disabled={isSubmitting}>
-              Submit
+              {isSubmitting ? "Loading..." : "Submit"}
             </Button>
           </Flex>
         </form>

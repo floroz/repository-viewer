@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { gitHubClient } from "../../shared/data-access/github-client.service";
+import { Repository } from "../types/repository";
 import { githubUtils } from "../utils/github.utils";
 
 const extractMetadataFromURI = (uri: string) => {
@@ -17,10 +18,10 @@ type Props = {
   onSuccess?: () => void;
 };
 
-export const useQueryBranches = (props: Props) => {
+export const useQueryRepository = (props: Props) => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<null | Record<string, unknown>>(null);
+  const [data, setData] = useState<null | Repository>(null);
 
   const findAllByURI = useCallback(async (uri: string) => {
     setLoading(true);
@@ -29,7 +30,12 @@ export const useQueryBranches = (props: Props) => {
 
       const res = await gitHubClient.getBranches(owner, repository);
 
-      setData(res);
+      const data: Repository = {
+        name: repository,
+        branches: res.map((item: any) => ({ name: item.name })),
+      };
+
+      setData(data);
       setError(null);
       props.onSuccess?.();
     } catch (error) {
@@ -40,5 +46,11 @@ export const useQueryBranches = (props: Props) => {
     }
   }, []);
 
-  return { error, data, findAllByURI, loading };
+  const reset = useCallback(() => {
+    setData(null);
+    setError(null);
+    setLoading(false);
+  }, []);
+
+  return { error, data, findAllByURI, loading, reset };
 };
