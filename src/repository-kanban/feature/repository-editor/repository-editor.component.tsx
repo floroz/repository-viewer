@@ -13,6 +13,7 @@ import { Repository } from "../../types/repository";
 
 import { useColumnsState } from "../../hooks/use-columns-state.hook";
 import { DroppableList } from "./draggable-item.component";
+import { repositoryStorageService } from "../../data-access/repository-storage.service";
 
 type ViewProps = Props & {
   repository: Repository;
@@ -21,10 +22,45 @@ type ViewProps = Props & {
 const displayStarsCount = (stars: number) =>
   stars >= 1000 ? `${(stars / 1000).toFixed(1)}k` : stars;
 
+function getInitialValue(
+  owner: string,
+  repo: string,
+  branches: { name: string }[]
+) {
+  try {
+    const cached = repositoryStorageService.getRepositoryFromStorage(
+      owner,
+      repo
+    );
+    if (cached) {
+      return cached;
+    }
+
+    return {
+      column1: branches.map(({ name }) => name),
+      column2: [],
+      column3: [],
+    };
+  } catch (error) {
+    return {
+      column1: branches.map(({ name }) => name),
+      column2: [],
+      column3: [],
+    };
+  }
+}
+
 const RepositoryEditorView = memo(({ repository, onGoBack }: ViewProps) => {
-  const { column1, column2, column3, moveToColumn } = useColumnsState(
-    repository?.branches ?? []
+  const initialValue = getInitialValue(
+    repository.owner,
+    repository.name,
+    repository.branches
   );
+  const { column1, column2, column3, moveToColumn } = useColumnsState({
+    owner: repository.owner,
+    repo: repository.name,
+    initialValue,
+  });
 
   return (
     <Box w="100%">

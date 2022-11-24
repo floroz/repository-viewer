@@ -1,13 +1,11 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { repositoryStorageService } from "../data-access/repository-storage.service";
+import cloneDeep from "lodash.clonedeep";
 
 export type Columns = {
   column1: string[];
   column2: string[];
   column3: string[];
-};
-
-export type Branch = {
-  name: string;
 };
 
 export type MoveToColumnCallback = (props: {
@@ -16,30 +14,42 @@ export type MoveToColumnCallback = (props: {
   current: keyof Columns;
 }) => void;
 
-export function useColumnsState(branches: Branch[]) {
-  const [columns, setColumns] = useState<Columns>({
-    column1: branches.map(({ name }) => name),
-    column2: [],
-    column3: [],
-  });
+type Props = {
+  owner: string;
+  repo: string;
+  initialValue: Columns;
+};
 
-  const moveToColumn: MoveToColumnCallback = ({
-    name,
-    destination,
-    current: origin,
-  }) => {
-    setColumns((state) => {
-      console.log(`Moving ${name} from ${origin} to ${destination}`);
-      // remove from current column
-      const filtered = state[origin].filter((n) => name !== n);
-      state[origin] = [...filtered];
-      // add to destination column
-      const added = state[destination].concat(name);
-      state[destination] = [...added];
+function updateColumns(
+  prevColumns: Columns,
+  name: string,
+  destination: keyof Columns,
+  origin: keyof Columns,
+  owner: string,
+  repo: string
+) {
+  const newColumns = cloneDeep(prevColumns);
+  // remove from current column
+  const filtered = newColumns[origin].filter((n) => name !== n);
+  newColumns[origin] = [...filtered];
+  // add to destination column
+  const added = newColumns[destination].concat(name);
+  newColumns[destination] = [...added];
+  repositoryStorageService.saveRepositoryToStorage(owner, repo, newColumns);
+  return newColumns;
+}
 
-      return { ...state };
-    });
-  };
+export function useColumnsState({ initialValue, owner, repo }: Props) {
+  const [columns, setColumns] = useState(initialValue);
+
+  const moveToColumn: MoveToColumnCallback = useCallback(
+    ({ name, destination, current: origin }) => {
+      setColumns((prevColumns) =>
+        updateColumns(prevColumns, name, destination, origin, owner, repo)
+      );
+    },
+    [columns]
+  );
 
   return {
     column1: columns.column1,

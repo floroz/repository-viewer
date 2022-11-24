@@ -35,6 +35,7 @@ export const useQueryRepository = (props: Props) => {
       ]);
 
       const data: Repository = {
+        owner: owner,
         name: repository,
         stars: repo["stargazers_count"],
         branches: branches.map((item: any) => ({ name: item.name })),

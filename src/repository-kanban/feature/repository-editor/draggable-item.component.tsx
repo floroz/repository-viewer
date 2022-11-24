@@ -42,7 +42,6 @@ export const DroppableList = ({
       {branches.map((name) => (
         <DraggableBranchTag name={name} key={name} columnId={columnId} />
       ))}
-      {canDrop && <Text>"Release to drop"</Text>}
     </List>
   );
 };
