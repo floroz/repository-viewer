@@ -6,5 +6,13 @@ type Props = {
 
 export const RepositoryEditor = memo(({ branches }: Props) => {
   console.log(branches);
-  return <div>Editor</div>;
+  return (
+    <div>
+      <ul>
+        {branches.map((branch: any) => (
+          <li>{branch.name}</li>
+        ))}
+      </ul>
+    </div>
+  );
 });
