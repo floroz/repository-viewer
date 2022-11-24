@@ -7,29 +7,24 @@ import {
   Grid,
   GridItem,
 } from "@chakra-ui/react";
-import { ArrowBackIcon, ChevronRightIcon, StarIcon } from "@chakra-ui/icons";
+import { ArrowBackIcon, StarIcon } from "@chakra-ui/icons";
 import { memo } from "react";
 import { Repository } from "../../types/repository";
 
 import { useColumnsState } from "../../hooks/use-columns-state.hook";
 import { DroppableList } from "./draggable-item.component";
 
-type Props = {
-  repository: Repository | null;
-  onGoBack: () => void;
+type ViewProps = Props & {
+  repository: Repository;
 };
 
 const displayStarsCount = (stars: number) =>
   stars >= 1000 ? `${(stars / 1000).toFixed(1)}k` : stars;
 
-export const RepositoryEditor = memo(({ repository, onGoBack }: Props) => {
+const RepositoryEditorView = memo(({ repository, onGoBack }: ViewProps) => {
   const { column1, column2, column3, moveToColumn } = useColumnsState(
     repository?.branches ?? []
   );
-
-  if (!repository) {
-    return <Box>No Repository Data</Box>;
-  }
 
   return (
     <Box w="100%">
@@ -80,3 +75,16 @@ export const RepositoryEditor = memo(({ repository, onGoBack }: Props) => {
     </Box>
   );
 });
+
+type Props = {
+  repository: Repository | null;
+  onGoBack: () => void;
+};
+
+export const RepositoryEditor = ({ onGoBack, repository }: Props) => {
+  if (!repository) {
+    return <Box>No Repository Data</Box>;
+  }
+
+  return <RepositoryEditorView onGoBack={onGoBack} repository={repository} />;
+};

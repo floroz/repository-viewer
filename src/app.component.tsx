@@ -2,9 +2,9 @@ import { RepositoryKanban } from "./repository-kanban/repository-kanban.componen
 
 const App = () => {
   return (
-    <div>
+    <>
       <RepositoryKanban />
-    </div>
+    </>
   );
 };
 

@@ -17,11 +17,11 @@ export type MoveToColumnCallback = (props: {
 }) => void;
 
 export function useColumnsState(branches: Branch[]) {
-  const [columns, setColumns] = useState<Columns>(() => ({
+  const [columns, setColumns] = useState<Columns>({
     column1: branches.map(({ name }) => name),
     column2: [],
     column3: [],
-  }));
+  });
 
   const moveToColumn: MoveToColumnCallback = ({
     name,
@@ -40,6 +40,7 @@ export function useColumnsState(branches: Branch[]) {
       return { ...state };
     });
   };
+
   return {
     column1: columns.column1,
     column2: columns.column2,
