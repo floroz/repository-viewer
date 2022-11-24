@@ -11,9 +11,10 @@ class GitHubClient {
     this._headers = headers;
   }
 
-  getBranches(owner: string, repo: string) {
-    return fetch(`${this._baseUrl}/repos/${owner}/${repo}/branches`, {
+  request(endpoint: string, method?: string) {
+    return fetch(`${this._baseUrl}${endpoint}`, {
       headers: this._headers,
+      method: method ?? "GET",
     }).then((res) => res.json());
   }
 }

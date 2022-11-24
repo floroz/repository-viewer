@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { RepositoryEditor } from "./feature/repository-editor/repository-editor.component";
 import { RepositoryForm } from "./feature/repository-form/repository-form.component";
-import { useQueryRepository } from "./data-access/use-query-repository.hook";
+import { useQueryRepository } from "./hooks/use-query-repository.hook";
 import { Box, Flex } from "@chakra-ui/react";
 
 enum Screen {

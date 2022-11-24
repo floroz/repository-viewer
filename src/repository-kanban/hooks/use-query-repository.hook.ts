@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { gitHubClient } from "../../shared/data-access/github-client.service";
+import { repositoryService } from "../data-access/repository.service";
 import { Repository } from "../types/repository";
 import { githubUtils } from "../utils/github.utils";
 
@@ -28,11 +29,15 @@ export const useQueryRepository = (props: Props) => {
     try {
       const { owner, repository } = extractMetadataFromURI(uri);
 
-      const res = await gitHubClient.getBranches(owner, repository);
+      const [branches, repo] = await Promise.all([
+        repositoryService.findBranches(owner, repository),
+        repositoryService.findRepository(owner, repository),
+      ]);
 
       const data: Repository = {
         name: repository,
-        branches: res.map((item: any) => ({ name: item.name })),
+        stars: repo["stargazers_count"],
+        branches: branches.map((item: any) => ({ name: item.name })),
       };
 
       setData(data);
